@@ -1,0 +1,6 @@
+0.1.0:
+    - Initial plugin setup
+    - create_activity_fields_table.php
+0.1.1:
+    - Added a couple more fields to activities
+    - add_additional_fields.php
