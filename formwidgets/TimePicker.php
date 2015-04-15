@@ -2,8 +2,17 @@
 
 use Backend\Classes\FormWidgetBase;
 
+/**
+ * TimePicker Form Widget
+ *
+ * This is used to control the input values on text inputs corresponding to
+ * time column types in the ExtraFields model/table. 
+ */
 class TimePicker extends FormWidgetBase
 {
+    /**
+     * {@inheritDoc}
+     */
     public function widgetDetails()
     {
         return [
@@ -12,17 +21,20 @@ class TimePicker extends FormWidgetBase
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function render()
     {
-        $data = $this->getLoadValue();
-
         $this->vars['name']     = $this->formField->getName();
-        $this->vars['value']    = $data;
+        $this->vars['value']    = $this->getLoadValue();
 
         return $this->makePartial('widget');
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public function loadAssets()
     {
         $this->addJS('jquery.timepicker.js');

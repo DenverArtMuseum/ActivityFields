@@ -6,23 +6,37 @@ use DMA\Friends\Models\Activity as Activity;
 use DenverArt\ActivityFields\Models\ExtraFields as Fields;
 use Illuminate\Foundation\AliasLoader;
 
-
-
-
+/**
+ * Activity Fileds plugin information file
+ *
+ * @package DenverArt\ActivityFields
+ * @author Matt Popke
+ */
 class Plugin extends \System\Classes\PluginBase
 {
+    /**
+     * @var array plugin dependencies
+     */
     public $require = ['DMA.Friends'];
 
+    /**
+     * Return information about this plugin
+     * 
+     * @return array
+     */
     public function pluginDetails()
     {
         return [
             'name' => 'Friends Activities Extensions',
-            'description' => 'Adds some new fields to friends activities.',
+            'description' => 'Adds additional fields to friends activities.',
             'author' => 'Denver Art Museum',
             'icon' => 'icon-database'
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function boot()
     {
         // Extend Activity model to support extra fields
@@ -36,6 +50,7 @@ class Plugin extends \System\Classes\PluginBase
             $context->extendedActivityFields($widget);
         });
 
+        // Extend Activity admin listing table columns
         Event::listen('backend.list.extendColumns', function($widget) {
             if (!$widget->getController() instanceof \DMA\Friends\Controllers\Activities) return;
 
@@ -58,6 +73,10 @@ class Plugin extends \System\Classes\PluginBase
         });
     }
 
+    /**
+     * Extend Activity fields when editing Friends Activities
+     * @param  [type] $widget [description]
+     */
     private function extendedActivityFields($widget)
     {
         if (!$widget->getController() instanceof \DMA\Friends\Controllers\Activities) return;
@@ -66,11 +85,15 @@ class Plugin extends \System\Classes\PluginBase
         // Make sure the extended fields exist for this Activity
         if (!Fields::getFromActivity($widget->model)) return;
 
+        $option_list = Fields::getOptions();
+
         $widget->addFields([
             'activity_fields[duration]' => [
                 'label' => 'Estimated Duration',
                 'tab'   => 'Configuration',
                 'span'  => 'left',
+                'type'  => 'dropdown',
+                'options'   => $option_list['duration'],
             ],
             'activity_fields[location]' => [
                 'label' => 'Location',
@@ -92,6 +115,9 @@ class Plugin extends \System\Classes\PluginBase
         ], 'secondary');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function registerFormWidgets()
     {
         return [
@@ -101,12 +127,4 @@ class Plugin extends \System\Classes\PluginBase
             ],
         ];   
     }
-    /*
-    public function registerComponents()
-    {
-        return [
-            '' => ''
-        ];
-    }
-    */
 }
