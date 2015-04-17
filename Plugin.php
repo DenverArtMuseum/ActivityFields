@@ -123,7 +123,7 @@ class Plugin extends \System\Classes\PluginBase
         return [
             'DenverArt\ActivityFields\FormWidgets\TimePicker' => [
                 'label' => 'TimePicker',
-                'alias' => 'timepicker',
+                'code'  => 'timepicker',
             ],
         ];   
     }
