@@ -4,3 +4,6 @@
 0.1.1:
     - Added a couple more fields to activities
     - add_additional_fields.php
+0.1.2:
+    - Added an engagement level field to activities
+    - add_engagement_field.php

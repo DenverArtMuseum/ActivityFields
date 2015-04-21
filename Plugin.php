@@ -95,6 +95,13 @@ class Plugin extends \System\Classes\PluginBase
                 'type'  => 'dropdown',
                 'options'   => $option_list['duration'],
             ],
+            'activity_fields[engagement]' => [
+                'label' => 'Engagement Level',
+                'tab'   => 'Configuration',
+                'span'  => 'left',
+                'type'  => 'dropdown',
+                'options'   => $option_list['engagement'],
+            ],
             'activity_fields[location]' => [
                 'label' => 'Location',
                 'tab'   => 'Configuration',

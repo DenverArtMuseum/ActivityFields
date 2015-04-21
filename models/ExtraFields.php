@@ -19,6 +19,12 @@ class ExtraFields extends Model
         '1h+'       => '1 hour or more',
     ];
 
+    public static $engagementOptions = [
+        '1' => 'Low',
+        '2' => 'Average',
+        '3' => 'High',
+    ];
+
     // Define database table for this model
     public $table = 'dam_activity_fields';
 
@@ -67,14 +73,13 @@ class ExtraFields extends Model
     }
 
     /**
-     * Return options for fields so that admin forms can use them
-     *
-     * So far, duration is the only field that needs this, but easily expanded
+     * Return options for enum fields so that admin forms can use them
      */
     public static function getOptions()
     {
         return [
-            'duration' => self::$durationOptions,
+            'duration'      => self::$durationOptions,
+            'engagement'    => self::$engagementOptions,
         ];
     }
 
