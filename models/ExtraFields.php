@@ -13,16 +13,16 @@ class ExtraFields extends Model
 {
     // Define possible key => values of dropdown for Activity duration
     public static $durationOptions = [
-        '10–15m'    => '10–15 minutes',
-        '20–30m'    => '20–30 minutes',
-        '45m'       => '45 minutes',
-        '1h+'       => '1 hour or more',
+        '10m'    => '10 minutes',
+        '15m'    => '15 minutes',
+        '30m'    => '30 minutes',
+        '45m+'   => '45 minutes or more',
     ];
 
     public static $engagementOptions = [
         '1' => 'Low',
-        '2' => 'Average',
-        '3' => 'High',
+        '3' => 'Average',
+        '5' => 'High',
     ];
 
     // Define database table for this model
@@ -81,6 +81,13 @@ class ExtraFields extends Model
             'duration'      => self::$durationOptions,
             'engagement'    => self::$engagementOptions,
         ];
+    }
+
+    public function afterSave()
+    {
+        $activity = Activity::find($this->getKey());
+
+        $activity->touch();
     }
 
 }
