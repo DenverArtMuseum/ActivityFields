@@ -39,9 +39,15 @@ class Plugin extends \System\Classes\PluginBase
      */
     public function boot()
     {
-        // Extend Activity model to support extra fields
+        // Extend Activity model to support extra fields & ratings
         Activity::extend(function($model) {
             $model->hasOne['activity_fields'] = ['DenverArt\ActivityFields\Models\ExtraFields'];
+            $model->hasMany['ratings']        = ['DenverArt\ActivityFields\Models\Rating'];
+        });
+
+        // Extend User model to support ratings
+        User::extend(function ($model) {
+            $model->hasMany['ratings'] = ['DenverArt\ActivityFields\Models\Rating'];
         });
 
         // Extend Activity fields
