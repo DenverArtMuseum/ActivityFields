@@ -3,6 +3,7 @@
 use Backend;
 use Illuminate\Support\Facades\Event;
 use DMA\Friends\Models\Activity as Activity;
+use Rainlab\User\Models\User as User;
 use DenverArt\ActivityFields\Models\ExtraFields as Fields;
 use Illuminate\Foundation\AliasLoader;
 
@@ -80,6 +81,29 @@ class Plugin extends \System\Classes\PluginBase
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function registerComponents()
+    {
+        return [
+            'DenverArt\ActivityFields\Components\ActivityInteractions' => 'ActivityInteractions',
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function registerFormWidgets()
+    {
+        return [
+            'DenverArt\ActivityFields\FormWidgets\TimePicker' => [
+                'label' => 'TimePicker',
+                'code'  => 'timepicker',
+            ],
+        ];   
+    }
+
+    /**
      * Extend Activity fields when editing Friends Activities
      * @param  [type] $widget [description]
      */
@@ -126,18 +150,5 @@ class Plugin extends \System\Classes\PluginBase
                 'type'  => 'checkbox',
             ],
         ], 'secondary');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function registerFormWidgets()
-    {
-        return [
-            'DenverArt\ActivityFields\FormWidgets\TimePicker' => [
-                'label' => 'TimePicker',
-                'code'  => 'timepicker',
-            ],
-        ];   
     }
 }

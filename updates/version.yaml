@@ -7,7 +7,7 @@
 0.1.2:
     - Added an engagement level field to activities
     - add_engagement_field.php
-0.2:
+0.2.0:
     - Added Rating table for users/activities
     - create_rating_table.php
 

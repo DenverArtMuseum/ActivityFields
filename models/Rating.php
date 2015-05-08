@@ -24,7 +24,7 @@ class Rating extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = [];
+    protected $fillable = ['activity_id','user_id'];
 
     public $rules = [];
 
@@ -35,4 +35,11 @@ class Rating extends Model
         'activity'  => ['DMA\Friends\Models\Activity'],
         'user'      => ['Rainlab\User\Models\User'],
     ];
+
+    public function rate($rating)
+    {
+        $this->rating = $rating;
+        $this->save();
+    }
+
 }
