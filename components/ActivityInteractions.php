@@ -7,6 +7,7 @@ use Flash;
 use Postman;
 use DenverArt\ActivityFields\Models\Rating as Rating;
 use DMA\Friends\Models\Activity as Activity;
+use DMA\Friends\Activities\ActivityCode;
 
 class ActivityInteractions extends ComponentBase
 {
@@ -18,49 +19,102 @@ class ActivityInteractions extends ComponentBase
         ];
     }
 
-    public function onRate()
-    {
-        $messages = '';
+    protected function validateSubmission($json) {
+        $err_str = 'Error in request: ';
 
-        // Get submit data
-        $json = post('rating');
-        if ($json && !empty($json)) {
-            $data = json_decode($json, true);
+        if (!$json || $json == '') {
+            Flash::error($err_str . 'No form data submitted.');
         }
         else {
-            // error
-            return [];
+            $data = json_decode($json, true);
+
+            if (!$data) {
+                Flash::error($err_str . 'Data submitted is invalid JSON');
+            }
+            else {
+                if (!isset($data['activity'])) {
+                    Flash::error($err_str . 'No activity submitted.');
+                }
+                else {
+                    $activity = Activity::find($data['activity']);
+
+                    if (!$activity) {
+                        Flash::error($err_str . 'Submitted activity does not exist.');
+                    }
+                    else {
+                        return [
+                            'activity' => $activity,
+                            'data'     => $data,
+                        ];
+                    }
+                }
+            }
         }
 
-        // Get User
-        $user = Auth::getUser();
+        return false;
+    }
 
-        // verify activity from id
-        $activity_id = $data['activity'];
-        $activity = Activity::find($activity_id);
-        if ( !$activity ) {
-            // error
-            //return [];
-            $messages = 'Activity check broken. <br/>';
+    public function onRate()
+    {
+        // Get submit data
+        $json = post('rating');
+
+        // Make sure the submission we've recieved is a valid request
+        $data = $this->validateSubmission($json);
+
+        if ($data) { // if false, do nothing. Flash messages created in validate function
+            if (!isset($data['data']['rating'])) {
+                Flash::error('No rating submitted.');
+            }
+            else {
+                // Get User
+                $user = Auth::getUser();
+
+                // Rate activity
+                $rating_val = $data['data']['rating'];
+                $rating = Rating::firstOrCreate(array('activity_id' => $data['activity']->id, 'user_id' => $user->id));
+                $rating->rate($rating_val);
+                $user->forceSave();
+
+                // construct flash message
+                if ($rating_val > 0) {
+                    $message = '<strong>You rated activity:</strong> ' . $data['activity']->title;            
+                }
+                else {
+                    $message = 'Rover has buried this activity. You can still find it in the catalog of activities.<br />'
+                        . '<strong>You removed:</strong> ' . $data['activity']->title;
+                }
+                Flash::success($message);
+            }
         }
 
-        // Rate activity (call to Rating model)
-        $rating = Rating::firstOrNew(array('activity_id' => $activity_id, 'user_id' => $user->id));
-        $rating->rate(0);
-
-        // construct flash message
-        $messages .= 'Message';
-        /*
-        Postman::send('activity_rating_successful', function(NotificationMessage $notification) use ($user, $activity) {
-            $nofication->to($user, $user->name);
-            $notification->message('You rated activity: ' . $activity->title);
-        }, ['flash']);
-        */
-        Flash::success('You rated activity: ' . $activity->title);
-        
         // return flash message
         return [
             '#flashMessages' => $this->renderPartial('@flashMessages'),
         ];
     }
+
+    public function onComplete()
+    {
+        // Get submit data
+        $json = post('completion');
+
+        // Validate json submission
+        $data = $this->validateSubmission($json);
+
+        if ($data) {
+            $params['code'] = $data['activity']->activity_code;
+            $user = Auth::getUser();
+
+            $activity = ActivityCode::process($user, $params);
+
+            Flash::success('Completed ' . $activity->title);
+        }
+
+        // return flash message
+        return [
+            '#flashMessages' => $this->renderPartial('@flashMessages'),
+        ];
+    }
+
 }

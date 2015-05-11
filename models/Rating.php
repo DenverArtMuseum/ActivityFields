@@ -39,7 +39,8 @@ class Rating extends Model
     public function rate($rating)
     {
         $this->rating = $rating;
-        $this->save();
+        $user = User::find($this->user_id);
+        $user->touch();
     }
 
 }
