@@ -1,10 +1,12 @@
 <?php namespace DenverArt\ActivityFields;
 
 use Backend;
+use Auth;
 use Illuminate\Support\Facades\Event;
 use DMA\Friends\Models\Activity as Activity;
 use Rainlab\User\Models\User as User;
 use DenverArt\ActivityFields\Models\ExtraFields as Fields;
+use DMA\Friends\Components\ActivityCatalog as ActivityCatalog;
 use Illuminate\Foundation\AliasLoader;
 
 /**
@@ -44,6 +46,36 @@ class Plugin extends \System\Classes\PluginBase
         Activity::extend(function($model) {
             $model->hasOne['activity_fields'] = ['DenverArt\ActivityFields\Models\ExtraFields'];
             $model->hasMany['ratings']        = ['DenverArt\ActivityFields\Models\Rating'];
+
+            $model->addDynamicMethod('scopeNotIgnored', function($query, $user) {
+                $query = $query->whereHas('ratings', function ($q) {
+                    $q->where('user_id', $user->getKey())
+                      ->where('rating', 0);
+                });
+            });
+        });
+
+        ActivityCatalog::extend(function($model) {
+            $model->addDynamicMethod('getResults', function($filterstr = null) {
+                $user = Auth::getUser();
+                $perpage = 10;
+
+                if ($filterstr && $filterstr != 'all') {
+                    $filters = json_decode($filterstr, true);
+                    if ($filters && is_array($filters['categories'])) {
+                        $results = Activity::isActive()->byNotIgnored($user)->byCategory($filters['categories'])->paginate($perpage);
+                    }
+                    else {
+                        $results = Activity::isActive()->byNotIgnored($user)->paginate($perpage);
+                    }
+                }
+                else {
+                    $results = Activity::isActive()->byNotIgnored($user)->paginate($perpage);
+                }
+
+                $this->page['activities'] = $results;
+                $this->page['links'] = $results['links'];
+            });
         });
 
         // Extend User model to support ratings
