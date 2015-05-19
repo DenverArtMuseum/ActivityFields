@@ -97,6 +97,7 @@ class Plugin extends \System\Classes\PluginBase
         return [
             'DenverArt\ActivityFields\Components\ActivityInteractions' => 'ActivityInteractions',
             'DenverArt\ActivityFields\Components\Explore'              => 'Explore',
+            'DenverArt\ActivityFields\Components\PopupHelp'            => 'PopupHelp',
         ];
     }
 
