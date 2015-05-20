@@ -108,7 +108,7 @@ class ActivityInteractions extends ComponentBase
 
             $activity = ActivityCode::process($user, $params);
 
-            Flash::success('Completed ' . $activity->title);
+            Flash::success('Great! What do you want to do next?<br /><strong>Completed:</strong> ' . $activity->title);
         }
 
         // return flash message
