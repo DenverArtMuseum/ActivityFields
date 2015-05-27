@@ -22,6 +22,7 @@
             };
             $.request('PopupHelp::onHelp', options);
         }
+        return false;
     });
 
     $('#popup-help-message').on('ajaxUpdate', function(e) {
