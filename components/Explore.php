@@ -119,7 +119,22 @@ class Explore extends ComponentBase
                 $string .= strtolower($time['start_time'] . '–' . $time['end_time']);
             }
             elseif ($type == 2) {
-                $string = 'between ' . date('M j, Y', strtotime($this->date_begin)) . ' and ' . date('M j, Y', strtotime($this->date_end));
+                $start = date('M j, Y', strtotime($result->date_begin));
+                $end = date('M j, Y', strtotime($result->date_end));
+
+                if ($start == $end) {
+                    $start = date('M j, Y g:i a', strtotime($result->date_begin));
+                    $end = date('M j, Y g:i a', strtotime($result->date_end));
+                    if ($start == $end) {
+                        $string = $start;
+                    }
+                    else {
+                        $end = date('g:i a', strtotime($result->date_end));
+                    }
+                }
+                if (!$string) {
+                    $string = $start . ' to ' . $end;
+                }
             }
 
             $restrictions[$index] = $string;
