@@ -53,6 +53,34 @@ class Plugin extends \System\Classes\PluginBase
                       ->where('rating', 0);
                 }, '<', 1);
             });
+
+            $model->addDynamicMethod('scopeNotComplete', function($query, $user) {
+                $query = $query->whereHas('users', function ($q) use ($user) {
+                    $q->where('user_id', $user->getKey());
+                }, '<', 1);
+            });
+
+            /*
+            $model->addDynamicMethod('restrictionToString', function () {
+                $string = '';
+                $type = $this->time_restriction;
+                $time = $this->time_restriction_data;
+                if ($type == 1) {
+                    $days = [];
+                    foreach ($time['days'] as $key => $value) {
+                        if ($value > 0) {
+                            $days[] = $dayNames[$key-1];
+                        }
+                    }
+                    $string = 'Days';
+                }
+                elseif ($type == 2) {
+                    $string = 'Period';
+                }
+
+                return $string;
+            });
+            */
         });
 
         // Extend User model to support ratings

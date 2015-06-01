@@ -68,18 +68,19 @@ class Explore extends ComponentBase
     {
         $user = Auth::getUser();
         $perpage = 12;
+        $dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
         if ($filterstr && $filterstr != 'all') {
             $filters = json_decode($filterstr, true);
             if ($filters && is_array($filters['categories'])) {
-                $results = Activity::isActive()->NotIgnored($user)->byCategory($filters['categories'])->paginate($perpage);
+                $results = Activity::isActive()->notIgnored($user)->notComplete($user)->byCategory($filters['categories'])->paginate($perpage);
             }
             else {
-                $results = Activity::isActive()->NotIgnored($user)->paginate($perpage);
+                $results = Activity::isActive()->notIgnored($user)->notComplete($user)->paginate($perpage);
             }
         }
         else {
-            $results = Activity::isActive()->NotIgnored($user)->paginate($perpage);
+            $results = Activity::isActive()->notIgnored($user)->notComplete($user)->paginate($perpage);
         }
 
         $this->page['activities'] = $results;
