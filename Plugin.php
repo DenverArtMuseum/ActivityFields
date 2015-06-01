@@ -8,6 +8,7 @@ use Rainlab\User\Models\User as User;
 use DenverArt\ActivityFields\Models\ExtraFields as Fields;
 use DMA\Friends\Components\ActivityCatalog as ActivityCatalog;
 use Illuminate\Foundation\AliasLoader;
+use DenverArt\ActivityFields\Classes\ExtendedActivity as ExtendedActivity;
 
 /**
  * Activity Fileds plugin information file
@@ -191,3 +192,5 @@ class Plugin extends \System\Classes\PluginBase
         ], 'secondary');
     }
 }
+
+

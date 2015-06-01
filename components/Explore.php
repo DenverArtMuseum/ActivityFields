@@ -2,6 +2,7 @@
 
 use Cms\Classes\ComponentBase;
 use DMA\Friends\Models\Activity;
+use DenverArt\ActivityFields\Classes\ExtendedActivity;
 use DMA\Friends\Models\Category;
 use RainLab\User\Models\User;
 use Auth;
@@ -69,6 +70,7 @@ class Explore extends ComponentBase
         $user = Auth::getUser();
         $perpage = 12;
         $dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $restrictions = [];
 
         if ($filterstr && $filterstr != 'all') {
             $filters = json_decode($filterstr, true);
@@ -83,7 +85,48 @@ class Explore extends ComponentBase
             $results = Activity::isActive()->notIgnored($user)->notComplete($user)->paginate($perpage);
         }
 
+        foreach ($results as $index => $result) {
+            $string = '';
+            $type = $result->time_restriction;
+            $time = $result->time_restriction_data;
+            if ($type == 1) {
+                $days = [];
+                foreach ($time['days'] as $key => $value) {
+                    if ($value > 0) {
+                        $days[] .= $dayNames[$key-1];
+                    }
+                }
+
+                $len = count($days);
+
+                switch($len) {
+                    case 0:
+                        break;
+                    case 1:
+                        $string = $days[0];
+                        break;
+
+                    case 2:
+                        $string = implode(' and ', $days);
+                        break;
+
+                    default:
+                        $last = array_pop($days);
+                        $string = implode(', ', $days) . ' and ' . $last;
+                }
+
+                $string .= ' at ';
+                $string .= strtolower($time['start_time'] . '–' . $time['end_time']);
+            }
+            elseif ($type == 2) {
+                $string = 'between ' . date('M j, Y', strtotime($this->date_begin)) . ' and ' . date('M j, Y', strtotime($this->date_end));
+            }
+
+            $restrictions[$index] = $string;
+        }
+
         $this->page['activities'] = $results;
+        $this->page['restrictions'] = $restrictions;
         $this->page['hasLinks'] = $results->hasMorePages() || $results->currentPage() > 1;
         $this->page['links'] = $results->render();
     }
