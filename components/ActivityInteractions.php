@@ -106,9 +106,48 @@ class ActivityInteractions extends ComponentBase
             $params['code'] = $data['activity']->activity_code;
             $user = Auth::getUser();
 
+            // Make sure the activity is NOT ignored before completing
+            // Completed activites cannot be ignored (or else elastic has trouble filtering them properly)
+            $rating = Rating::where('activity_id', $data['activity']->id)
+                            ->where('user_id', $user->id)
+                            ->where('rating', 0)
+                            ->first();
+            if ($rating) {
+                Rating::where('activity_id', $data['activity']->id)
+                      ->where('user_id', $user->id)
+                      ->delete();
+            }        
+
             $activity = ActivityCode::process($user, $params);
 
             Flash::success('Great! What do you want to do next?<br /><strong>Completed:</strong> ' . $activity->title);
+        }
+
+        // return flash message
+        return [
+            '#flashMessages' => $this->renderPartial('@flashMessages'),
+        ];
+    }
+
+    public function onUndoHide()
+    {
+        // Get submit data
+        $activity_id = (int) post('activity');
+
+        // Validate
+        $activity = Activity::find($activity_id);
+        if ($activity) {
+            // Get User
+            $user = Auth::getUser();
+
+            Rating::where('activity_id', $activity_id)
+                  ->where('user_id', $user->id)
+                  ->delete();
+
+            Flash::success('Okay. That activity will be available in your recommendations now.');
+        }
+        else {
+            Flash::error('That activity does not exist.');
         }
 
         // return flash message

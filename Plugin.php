@@ -55,33 +55,25 @@ class Plugin extends \System\Classes\PluginBase
                 }, '<', 1);
             });
 
+            $model->addDynamicMethod('scopeIgnored', function($query, $user) {
+                $query = $query->whereHas('ratings', function ($q) use ($user) {
+                    $q->where('user_id', $user->getKey())
+                      ->where('rating', 0);
+                });
+            });
+
             $model->addDynamicMethod('scopeNotComplete', function($query, $user) {
                 $query = $query->whereHas('users', function ($q) use ($user) {
                     $q->where('user_id', $user->getKey());
                 }, '<', 1);
             });
 
-            /*
-            $model->addDynamicMethod('restrictionToString', function () {
-                $string = '';
-                $type = $this->time_restriction;
-                $time = $this->time_restriction_data;
-                if ($type == 1) {
-                    $days = [];
-                    foreach ($time['days'] as $key => $value) {
-                        if ($value > 0) {
-                            $days[] = $dayNames[$key-1];
-                        }
-                    }
-                    $string = 'Days';
-                }
-                elseif ($type == 2) {
-                    $string = 'Period';
-                }
-
-                return $string;
+            $model->addDynamicMethod('scopeComplete', function($query, $user) {
+                $query = $query->whereHas('users', function ($q) use ($user) {
+                    $q->where('user_id', $user->getKey());
+                });
             });
-            */
+
         });
 
         // Extend User model to support ratings
@@ -126,6 +118,7 @@ class Plugin extends \System\Classes\PluginBase
         return [
             'DenverArt\ActivityFields\Components\ActivityInteractions' => 'ActivityInteractions',
             'DenverArt\ActivityFields\Components\Explore'              => 'Explore',
+            'DenverArt\ActivityFields\Components\Ignored'              => 'Ignored',
             'DenverArt\ActivityFields\Components\PopupHelp'            => 'PopupHelp',
         ];
     }
