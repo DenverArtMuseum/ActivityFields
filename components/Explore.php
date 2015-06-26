@@ -75,14 +75,27 @@ class Explore extends ComponentBase
         if ($filterstr && $filterstr != 'all') {
             $filters = json_decode($filterstr, true);
             if ($filters && is_array($filters['categories'])) {
-                $results = Activity::isActive()->notIgnored($user)->notComplete($user)->startedNotExpired()->byCategory($filters['categories'])->paginate($perpage);
+                $results = Activity::isActive()
+                    ->notIgnored($user)
+                    ->notComplete($user)
+                    ->startedNotExpired()
+                    ->byCategory($filters['categories'])
+                    ->paginate($perpage);
             }
             else {
-                $results = Activity::isActive()->notIgnored($user)->notComplete($user)->startedNotExpired()->paginate($perpage);
+                $results = Activity::isActive()
+                    ->notIgnored($user)
+                    ->notComplete($user)
+                    ->startedNotExpired()
+                    ->paginate($perpage);
             }
         }
         else {
-            $results = Activity::isActive()->notIgnored($user)->notComplete($user)->startedNotExpired()->paginate($perpage);
+            $results = Activity::isActive()
+                ->notIgnored($user)
+                ->notComplete($user)
+                ->startedNotExpired()
+                ->paginate($perpage);
         }
 
         foreach ($results as $index => $result) {
