@@ -75,19 +75,45 @@ class Explore extends ComponentBase
         if ($filterstr && $filterstr != 'all') {
             $filters = json_decode($filterstr, true);
             if ($filters && is_array($filters['categories'])) {
-                $results = Activity::isActive()
-                    ->notIgnored($user)
-                    ->notComplete($user)
-                    ->startedNotExpired()
-                    ->byCategory($filters['categories'])
-                    ->paginate($perpage);
+                if ($filters['sort'] == 'location') {
+                    $results = Activity::isActive()
+                        ->notIgnored($user)
+                        ->notComplete($user)
+                        ->startedNotExpired()
+                        ->byCategory($filters['categories'])
+                        ->join('dam_activity_fields', 'dam_activity_fields.activity_id', '=', 'dma_friends_activities.id')
+                        ->orderBy('dam_activity_fields.location')
+                        ->paginate($perpage);
+                }
+                else {
+                    $results = Activity::isActive()
+                        ->notIgnored($user)
+                        ->notComplete($user)
+                        ->startedNotExpired()
+                        ->byCategory($filters['categories'])
+                        ->orderBy('title')
+                        ->paginate($perpage);                    
+                }
+
             }
             else {
-                $results = Activity::isActive()
-                    ->notIgnored($user)
-                    ->notComplete($user)
-                    ->startedNotExpired()
-                    ->paginate($perpage);
+                if ($filters['sort'] == 'location') {
+                    $results = Activity::isActive()
+                        ->notIgnored($user)
+                        ->notComplete($user)
+                        ->startedNotExpired()
+                        ->join('dam_activity_fields', 'dam_activity_fields.activity_id', '=', 'dma_friends_activities.id')
+                        ->orderBy('dam_activity_fields.location')
+                        ->paginate($perpage);
+                }
+                else {
+                    $results = Activity::isActive()
+                        ->notIgnored($user)
+                        ->notComplete($user)
+                        ->startedNotExpired()
+                        ->orderBy('title')
+                        ->paginate($perpage);                    
+                }
             }
         }
         else {
@@ -95,6 +121,7 @@ class Explore extends ComponentBase
                 ->notIgnored($user)
                 ->notComplete($user)
                 ->startedNotExpired()
+                ->orderBy('title')
                 ->paginate($perpage);
         }
 
