@@ -141,6 +141,7 @@ class Ignored extends ComponentBase
         }
 
         $this->page['activities'] = $results;
+        $this->page['activity_count'] = $results->count();
         $this->page['restrictions'] = $restrictions;
         $this->page['hasLinks'] = $results->hasMorePages() || $results->currentPage() > 1;
         $this->page['links'] = $results->render();
