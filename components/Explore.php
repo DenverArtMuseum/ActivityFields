@@ -75,7 +75,7 @@ class Explore extends ComponentBase
         if ($filterstr && $filterstr != 'all') {
             $filters = json_decode($filterstr, true);
             if ($filters && is_array($filters['categories'])) {
-                if ($filters['sort'] == 'location') {
+                if (isset($filters['sort']) && $filters['sort'] == 'location') {
                     $results = Activity::isActive()
                         ->notIgnored($user)
                         ->notComplete($user)
@@ -97,7 +97,7 @@ class Explore extends ComponentBase
 
             }
             else {
-                if ($filters['sort'] == 'location') {
+                if (isset($filters['sort']) && $filters['sort'] == 'location') {
                     $results = Activity::isActive()
                         ->notIgnored($user)
                         ->notComplete($user)
